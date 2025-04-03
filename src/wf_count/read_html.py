@@ -7,6 +7,23 @@ def get_soup(url):
     return BeautifulSoup(html_doc, 'html.parser')
 
 
+def get_text(url):
+
+    return get_soup(url).get_text()
+
+
+def save_text(data, filename):
+
+    with open(filename, "w") as fp:
+        for line in data:
+            fp.write(line)
+
+
+def save_text_from_html(url, filename):
+
+    save_text(get_text(url), filename)
+
+
 def get_links_from_main_url(url: str):
 
     soup = get_soup(url)
@@ -24,9 +41,3 @@ def get_links_from_main_url(url: str):
                 else:
                     inside_links.add(f"{url}/{link.get('href')}")
     return inside_links
-
-
-def get_texts(urls):
-
-    return [get_soup(url).get_text() for url in urls]
-

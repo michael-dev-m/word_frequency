@@ -1,8 +1,13 @@
 from collections import Counter
+import json
+import os
 
 
 FIRST_SYMBOL_OF_VARIABLE_NAME = r"_*#$"
 MINIMUM_WORD_LENGTH = 2
+I_KNOW = "i_know_these_words.json"
+I_AM_LEARNING = "i_am_learning_these_words.json"
+I_DO_NOT_KNOW = "i_do_not_know_these_words.json"
 
 
 lowercase_first_char = lambda string: string[:1].lower() + string[1:] if string else ''
@@ -22,9 +27,9 @@ def count_words(text: str) -> Counter:
     words = text.split()
     for word in words:
         if len(word) < MINIMUM_WORD_LENGTH:
-            break
+            continue
         if word[0] in FIRST_SYMBOL_OF_VARIABLE_NAME:
-            break
+            continue
         if not word[-1].isalpha():
             word = word[: -1]
         if not word[0].isalpha():
@@ -34,3 +39,45 @@ def count_words(text: str) -> Counter:
                 and clear_word.islower()):
             clear_words.append(clear_word)
     return Counter(clear_words)
+
+
+def save_data(data, filename):
+
+    with open(filename,  'w') as fp:
+        json.dump(data, fp)
+
+
+def load_data(filename):
+
+    with open(filename,  'r') as fp:
+        data = json.load(fp)
+    return data
+
+
+def load_text(filename):
+
+    with open(filename, "r") as fp:
+        return fp.read()
+
+
+def sort_words_into_known_and_unknown(file_name):
+
+    words_from_text = count_words(load_text(file_name))
+    i_know_words = load_data(os.path.join(os.getcwd(),I_KNOW))
+    i_do_not_know_words = load_data(os.path.join(os.getcwd(),I_DO_NOT_KNOW))
+    i_am_learning_words = load_data(os.path.join(os.getcwd(),I_AM_LEARNING))
+    words = words_from_text - Counter(i_know_words) - Counter(i_do_not_know_words) - Counter(i_am_learning_words)
+    print(f"{len(words)}")
+    for word, count in words.most_common():
+        answer = input(f"Do you know - {word}? y/n: ")
+        if answer == "y" or answer == "Y":
+            i_know_words[word] = count
+        if answer == "n" or answer == "N":
+            i_do_not_know_words[word] = count
+        if answer == "exit":
+            break
+    save_data(i_know_words, I_KNOW)
+    save_data(i_do_not_know_words, I_DO_NOT_KNOW)
+
+    print(f"There are {len(i_do_not_know_words)} unknown words in the list of unknown words.")
+    print(f"Wow! You know {len(i_know_words)} words.")
