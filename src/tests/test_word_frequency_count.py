@@ -12,6 +12,7 @@ data_text = [
     ("I", {}),
     ("", {}),
     ("count_animals == 5", {}),
+    (" len(new_zoo)-1+len(new_zoo[2]) 1", {}),
     ("count7 ", {"count": 1}),
     ("_variable", {}),
     ("first.py", {}),
